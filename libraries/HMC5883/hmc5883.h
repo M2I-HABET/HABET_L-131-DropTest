@@ -13,15 +13,16 @@
 // 7-bit I2C address for the chip
 #define HMC5883_ADDR 0x1E
 
-typedef struct HMC5883_data {
+typedef struct HMC5883_DATA {
 	short x;
 	short y;
 	short z;
-}
+} HMC5883_DATA;
 
 class HMC5883 {
-	
+
+public:
 	HMC5883();
 	void init();
-	HMC5883_data getData();
-}
+	HMC5883_DATA getData();
+};
