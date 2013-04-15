@@ -44,16 +44,7 @@ MPU6000_RAW_DATA MPU6000::getRawGyroData() {
 	MPU6000_RAW_DATA data;
 	int i = 0;
 	short buf[6];
-/* 	
-	// Read the X axis data
-	data.x = (readRegister(MPU6000_REG_GYRO_X_H)<<8)+(readRegister(MPU6000_REG_GYRO_X_L));
-	
-	// Read the Y axis data
-	data.y = (readRegister(MPU6000_REG_GYRO_Y_H)<<8)+(readRegister(MPU6000_REG_GYRO_Y_L));
 
-	// Read the Z axis data
-	data.z = (readRegister(MPU6000_REG_GYRO_Z_H)<<8)+(readRegister(MPU6000_REG_GYRO_Z_L));
-*/
 	// Pull chip select low to begin
 	digitalWrite(MPU6000_CHIP_SELECT, LOW);
 	
