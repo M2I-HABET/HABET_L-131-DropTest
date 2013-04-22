@@ -1,4 +1,5 @@
-//#include <SPI.h>
+#ifndef MPU6000_H_
+#define MPU6000_H_
 
 // MPU6000 Chip Select Pin (Arduino Number System)
 #define MPU6000_CHIP_SELECT			53
@@ -74,3 +75,5 @@ private:
 	short readRegister(short reg);
 	void writeRegister(short reg, short val);
 };
+
+#endif
