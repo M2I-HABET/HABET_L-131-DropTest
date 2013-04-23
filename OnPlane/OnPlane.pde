@@ -32,9 +32,16 @@ void setup() {
 }
 
 void loop() {
-
+	pos.time = 0;
+	pos.latitude = 0;
+	pos.longitude = 0;
+	pos.altitude = 0;
+	pos.satellites = 0;
+	pos.hdop = 0;
+	pos.fixType = 0;
+	pos.fixStatus = 0;
 	pos = gps.getPositionInfo();
-
+/*
 	Serial.print("#");
 	Serial.print(pos.time);
 	Serial.print(",");
@@ -52,7 +59,7 @@ void loop() {
 	Serial.print(",");
 	Serial.print(pos.fixStatus);
 	Serial.print("\n\r");
-
+*/
 //	Serial.print("Reading Accelerometer");
 	accel = imu.getRawAccelData();
 //	Serial.print("\tReading Gyro");

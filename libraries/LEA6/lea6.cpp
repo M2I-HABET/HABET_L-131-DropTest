@@ -218,16 +218,17 @@ bool LEA6::parseGPS() {
 
 	switch (_msg_id) {
 	case MSG_POSLLH:
-//		Serial.println("MSG_POSLLH next_fix=%u");
+		Serial.println("MSG_POSLLH next_fix=%u");
 		info->time = buffer.posllh.time;
 		info->longitude = buffer.posllh.longitude;
 		info->latitude = buffer.posllh.latitude;
 		info->altitude = buffer.posllh.altitude_msl / 10;
+		Serial.println(buffer.posllh.altitude_msl);
 //		fix             = next_fix;
 		newPosition = true;
 		break;
 	case MSG_STATUS:
-//		Serial.println("MSG_STATUS");
+		Serial.println("MSG_STATUS");
 /*		next_fix        = (buffer.status.fix_status & NAV_STATUS_FIX_VALID) && (buffer.status.fix_type == FIX_3D);
 		if (!next_fix) {
 			fix = false;
@@ -237,7 +238,7 @@ bool LEA6::parseGPS() {
 		info->fixType = buffer.status.fix_type;
 		break;
 	case MSG_SOL:
-//		Serial.println("MSG_SOL");
+		Serial.println("MSG_SOL");
 /*		next_fix        = (buffer.solution.fix_status & NAV_STATUS_FIX_VALID) && (buffer.solution.fix_type == FIX_3D);
 		if (!next_fix) {
 			fix = false;
