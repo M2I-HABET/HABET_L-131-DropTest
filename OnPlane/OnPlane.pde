@@ -10,7 +10,7 @@ LEA6 gps;
 
 MPU6000_RAW_DATA accel;
 MPU6000_RAW_DATA gyro;
-UBLOX_RECEIVED_INFO pos;
+UBLOX_RECEIVED_INFO *pos;
 
 void setup() {
 	Serial.begin(57600);	// Serial port for the radio telemetry input/output
@@ -32,34 +32,37 @@ void setup() {
 }
 
 void loop() {
-	pos.time = 0;
-	pos.latitude = 0;
-	pos.longitude = 0;
-	pos.altitude = 0;
-	pos.satellites = 0;
-	pos.hdop = 0;
-	pos.fixType = 0;
-	pos.fixStatus = 0;
-	pos = gps.getPositionInfo();
-/*
-	Serial.print("#");
-	Serial.print(pos.time);
-	Serial.print(",");
-	Serial.print(pos.latitude);
-	Serial.print(",");
-	Serial.print(pos.longitude);
-	Serial.print(",");
-	Serial.print(pos.altitude);
-	Serial.print(",");
-	Serial.print(pos.satellites);
-	Serial.print(",");
-	Serial.print(pos.hdop);
-	Serial.print(",");
-	Serial.print(pos.fixType);
-	Serial.print(",");
-	Serial.print(pos.fixStatus);
-	Serial.print("\n\r");
+/*	pos->time = 0;
+	pos->latitude = 0;
+	pos->longitude = 0;
+	pos->altitude = 0;
+	pos->satellites = 0;
+	pos->hdop = 0;
+	pos->fixType = 0;
+	pos->fixStatus = 0;
 */
+	if(gps.hasNewPosition() == true) {
+		pos = gps.getPositionInfo();
+
+		Serial.print("#");
+		Serial.print(pos->time, DEC);
+		Serial.print(",");
+		Serial.print(pos->latitude, DEC);
+		Serial.print(",");
+		Serial.print(pos->longitude, DEC);
+		Serial.print(",");
+		Serial.print(pos->altitude, DEC);
+		Serial.print(",");
+		Serial.print(pos->satellites, DEC);
+		Serial.print(",");
+		Serial.print(pos->hdop, DEC);
+		Serial.print(",");
+		Serial.print(pos->fixType, DEC);
+		Serial.print(",");
+		Serial.print(pos->fixStatus, DEC);
+		Serial.print("\n\r");
+	}
+
 //	Serial.print("Reading Accelerometer");
 	accel = imu.getRawAccelData();
 //	Serial.print("\tReading Gyro");

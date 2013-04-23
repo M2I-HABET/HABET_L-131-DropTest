@@ -22,9 +22,10 @@ void LEA6::init(void) {
     // the GPS may be setup for a different baud rate. This ensures
     // it gets configured correctly
     for (uint8_t i=0; i<4; i++) {
+		// Do not remove this print statement. If it is missing then the GPS fails to configure for some reason.
+		// I have no idea why, but this fixes it. SO DO NOT DELETE THIS LINE UNDER PENALTY OF DEATH.
 		Serial.println(baudrates[i]);
-        Serial1.begin(baudrates[i]);
-		
+		Serial1.begin(baudrates[i]);
 		/*
 		 *  try to put a UBlox into binary mode. This is in two parts. First we
 		 *  send a PUBX asking the UBlox to receive NMEA and UBX, and send UBX,
@@ -32,12 +33,11 @@ void LEA6::init(void) {
 		 *  for the NAV_SOL message. The setup of NAV_SOL is to cope with
 		 *  configurations where all UBX binary message types are disabled.
 		 */
-		Serial.print(Serial1.write("$PUBX,41,1,0003,0001,38400,0*26\r\n"));
+		Serial.print(Serial1.write("$PUBX,41,1,0003,0001,38400,0*26\r\n\265\142\006\001\003\000\001\006\001\022\117"));
  //       _write_progstr_block(_port, _ublox_set_binary, _ublox_set_binary_size);
     }
     Serial1.begin(38400U);
 
-	Serial.println("Setting Nav Solution");
     // ask for navigation solutions every 200ms
     msg.measure_rate_ms = 200;
     msg.nav_rate        = 1;
@@ -48,17 +48,23 @@ void LEA6::init(void) {
     configure_message_rate(CLASS_NAV, MSG_POSLLH, 1);
     configure_message_rate(CLASS_NAV, MSG_STATUS, 1);
     configure_message_rate(CLASS_NAV, MSG_SOL, 1);
+	configure_message_rate(CLASS_NAV, MSG_PVT, 1);
     configure_message_rate(CLASS_NAV, MSG_VELNED, 1);
 
     // ask for the current navigation settings
-	Serial.println("Asking for engine setting\n");
     send_message(CLASS_CFG, MSG_CFG_NAV_SETTINGS, NULL, 0);
+	newPositionAvailable = false;
 }
 
-UBLOX_RECEIVED_INFO LEA6::getPositionInfo() {
+UBLOX_RECEIVED_INFO* LEA6::getPositionInfo() {
+	newPositionAvailable = false;
+	return(info);
+}
+
+bool LEA6::hasNewPosition() {
 	this->readGPS();
 	this->parseGPS();
-	return(*info);
+	return(newPositionAvailable);
 }
 
 
@@ -218,17 +224,18 @@ bool LEA6::parseGPS() {
 
 	switch (_msg_id) {
 	case MSG_POSLLH:
-		Serial.println("MSG_POSLLH next_fix=%u");
+//		Serial.println("MSG_POSLLH next_fix=%u");
 		info->time = buffer.posllh.time;
 		info->longitude = buffer.posllh.longitude;
 		info->latitude = buffer.posllh.latitude;
-		info->altitude = buffer.posllh.altitude_msl / 10;
-		Serial.println(buffer.posllh.altitude_msl);
+		info->altitude = buffer.posllh.altitude_ellipsoid / 1000;
+//		Serial.println(buffer.posllh.altitude_ellipsoid/1000);
 //		fix             = next_fix;
 		newPosition = true;
+		newPositionAvailable = true;
 		break;
 	case MSG_STATUS:
-		Serial.println("MSG_STATUS");
+//		Serial.println("MSG_STATUS");
 /*		next_fix        = (buffer.status.fix_status & NAV_STATUS_FIX_VALID) && (buffer.status.fix_type == FIX_3D);
 		if (!next_fix) {
 			fix = false;
@@ -238,7 +245,7 @@ bool LEA6::parseGPS() {
 		info->fixType = buffer.status.fix_type;
 		break;
 	case MSG_SOL:
-		Serial.println("MSG_SOL");
+//		Serial.println("MSG_SOL");
 /*		next_fix        = (buffer.solution.fix_status & NAV_STATUS_FIX_VALID) && (buffer.solution.fix_type == FIX_3D);
 		if (!next_fix) {
 			fix = false;
@@ -246,6 +253,9 @@ bool LEA6::parseGPS() {
 */
 		info->satellites = buffer.solution.satellites;
 		info->hdop = buffer.solution.position_DOP;
+		break;
+	case MSG_PVT:
+		Serial.println("MSG_PVT");
 		break;
 	case MSG_VELNED:
 
@@ -261,8 +271,9 @@ bool LEA6::parseGPS() {
 */
 		break;
 	default:
-//		Serial.println("Unexpected NAV message 0x%02x");
+//		Serial.print("Unexpected NAV message 0x02x");
 //		Serial.print(_msg_id, HEX);
+//		Serial.print("\r\n");
 		if (disable_counter == 0) {
 //			Serial.println("Disabling NAV message 0x%02x");
 			configure_message_rate(CLASS_NAV, _msg_id, 0);

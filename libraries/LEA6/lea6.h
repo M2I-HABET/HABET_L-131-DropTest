@@ -20,6 +20,7 @@ enum UBLOX_PROTOCOL_BYTES {
 	MSG_POSLLH = 0x2,
 	MSG_STATUS = 0x3,
 	MSG_SOL = 0x6,
+	MSG_PVT = 0x7,
 	MSG_VELNED = 0x12,
 	MSG_CFG_PRT = 0x00,
 	MSG_CFG_RATE = 0x08,
@@ -87,6 +88,38 @@ struct UBLOX_NAV_POSLLH {
 	uint32_t vertical_accuracy;
 };
 
+struct UBLOX_NAV_PVT {
+	uint32_t itow;
+	uint16_t year;
+	uint8_t month;
+	uint8_t day;
+	uint8_t hour;
+	uint8_t min;
+	uint8_t sec;
+	uint8_t valid;
+	uint32_t tAccuracy;
+	int32_t nano;
+	uint8_t fixType;
+	uint8_t flags;
+	uint8_t res1;
+	uint8_t numSats;
+	int32_t longitude;
+	int32_t latitude;
+	int32_t altAboveElipse;
+	int32_t altAboveMSL;
+	uint32_t hAccuracy;
+	uint32_t vAccuracy;
+	int32_t velN;
+	int32_t velE;
+	int32_t velD;
+	int32_t groundSpeed;
+	int32_t heading;
+	uint32_t sAccuracy;
+	uint16_t pdop;
+	uint16_t res2;
+	uint32_t res3;
+};
+
 struct UBLOX_NAV_STATUS {
 	uint32_t time;                                  // GPS msToW
 	uint8_t fix_type;
@@ -148,11 +181,12 @@ class LEA6 {
 public:
 	LEA6();
 	void init();
-	bool readGPS();
-	UBLOX_RECEIVED_INFO getPositionInfo();
+	bool hasNewPosition();
+	UBLOX_RECEIVED_INFO* getPositionInfo();
 	
 private:
 
+	bool readGPS();
 	bool parseGPS();
 	void configure_message_rate(uint8_t msg_class, uint8_t msg_id, uint8_t rate);
 	void update_checksum(uint8_t *data, uint8_t len, uint8_t &ck_a, uint8_t &ck_b);
@@ -161,6 +195,7 @@ private:
 	UBLOX_RECEIVED_INFO* info;	// Position information from the uBlox
     uint8_t fixCount;			// I have no idea what this is for, but it is here anyway
     bool newPosition;			// New position received
+	bool newPositionAvailable;
 	uint8_t disable_counter;	// Don't start an ACK war
 	
 	    // Packet checksum accumulators
@@ -180,6 +215,7 @@ private:
 		UBLOX_NAV_SOLUTION solution;
 		UBLOX_NAV_VELNED velned;
 		UBLOX_CFG_NAV_SETTINGS nav_settings;
+		UBLOX_NAV_PVT pvt;
 		uint8_t bytes[];
 	} buffer;
 	
