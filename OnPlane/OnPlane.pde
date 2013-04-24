@@ -20,7 +20,7 @@ LEA6 gps;
 MPU6000_RAW_DATA accel;
 MPU6000_RAW_DATA gyro;
 HMC5883_DATA mag;
-UBLOX_RECEIVED_INFO *pos;
+UBLOX_RECEIVED_INFO pos;
 int imuCollecTime;
 
 void setup() {
@@ -61,34 +61,23 @@ void loop() {
 //		Serial.print("\tDone Reading\r\n");
 	}
 
-/*	pos->time = 0;
-	pos->latitude = 0;
-	pos->longitude = 0;
-	pos->altitude = 0;
-	pos->satellites = 0;
-	pos->hdop = 0;
-	pos->fixType = 0;
-	pos->fixStatus = 0;
-*/
-	if(gps.hasNewPosition() == true) {
+	if(gps.readGPS() == true) {
 		pos = gps.getPositionInfo();
 
 		Serial.print("#");
-		Serial.print(pos->time, DEC);
+		Serial.print(pos.time, DEC);
 		Serial.print(",");
-		Serial.print(pos->latitude, DEC);
+		Serial.print(pos.latitude, DEC);
 		Serial.print(",");
-		Serial.print(pos->longitude, DEC);
+		Serial.print(pos.longitude, DEC);
 		Serial.print(",");
-		Serial.print(pos->altitude, DEC);
+		Serial.print(pos.altitude, DEC);
 		Serial.print(",");
-		Serial.print(pos->satellites, DEC);
+		Serial.print(pos.satellites, DEC);
 		Serial.print(",");
-		Serial.print(pos->hdop, DEC);
+		Serial.print(pos.hdop, DEC);
 		Serial.print(",");
-		Serial.print(pos->fixType, DEC);
-		Serial.print(",");
-		Serial.print(pos->fixStatus, DEC);
+		Serial.print(pos.fixAge, DEC);
 		Serial.print("\n\r");
 	}
 
