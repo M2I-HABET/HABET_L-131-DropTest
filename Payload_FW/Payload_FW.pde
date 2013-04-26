@@ -18,6 +18,7 @@
  0.2 - Added GPS parsing using TinyGPS library
  0.25 - GPS library tested and tweaked, parsing NMEA strings 
  0.3 - Very basic system for reading in a char and triggering an output
+ 0.31 - Updated burn time to 6 sec, added command to trigger data log on plane, changed baud rates
  
  */
 
@@ -57,11 +58,11 @@ void setup() {
   pinMode(BURN2, OUTPUT);
   pinMode(BURN3, OUTPUT);
   // initialize all the serial ports!
-  Serial.begin(9600);   //USB port and Radio out
-  Serial1.begin(4800);  //Data from other RFD900, echos to 0
+  Serial.begin(57600);   //USB port and Radio out
+  Serial1.begin(57600);  //Data from other RFD900, echos to 0
   Serial2.begin(4800);  //GPS device connected
   
-  Serial.println("Booting up HAL (High Altitude Link) 2000");
+  Serial.println("Booting up HAL (High Altitude Link) 9000");
   Serial.println("Hello Matthew, would you like to play a game of chess?");
   Serial.println("Initializing HABET Computer...");
   Serial.print("Testing TinyGPS library v. "); Serial.println(TinyGPS::library_version());
@@ -69,10 +70,10 @@ void setup() {
   Serial.print("Sizeof(gpsobject) = "); Serial.println(sizeof(TinyGPS));
   Serial.println();
   Serial.println("GPS Library and onboard computer initialized");
-  Serial.println("----------------------------------------------------------------------------------------------------------------");
+  Serial.println("------------------------------------------------------------------------------------------------------------");
   Serial.println("Sats HDOP Latitude Longitude Fix  Date       Time       Alt    Course Speed Comp.  Sentences Checksum");
-  Serial.println("          (deg)    (deg)     Age        (UTC)                  (m)     from GPS     RX        Fails");
-  Serial.println("----------------------------------------------------------------------------------------------------------------");
+  Serial.println("          (deg)    (deg)     Age       (UTC)                   (m)     from GPS     RX        Fails");
+  Serial.println("------------------------------------------------------------------------------------------------------------");
 
 }
 
@@ -92,20 +93,51 @@ void loop() {
     int inByte = Serial.read();
     if (inByte == '1'){
     Serial.println("Dropping plane 1...");
+    Serial1.println("$PT1DR#");
     digitalWrite(BURN1,1);
-    delay(2000);
+    delay(6000);
     digitalWrite(BURN1,0);
     }
     if (inByte == '2'){
     Serial.println("Dropping plane 2...");
+    Serial1.println("$PT2DR#");
     digitalWrite(BURN2,1);
-    delay(2000);
+    delay(6000);
     digitalWrite(BURN2,0);
     }
     if (inByte == '3'){
     Serial.println("Dropping plane 3...");
+    Serial1.println("$PT3DR#");
     digitalWrite(BURN3,1);
-    delay(2000);
+    delay(6000);
+    digitalWrite(BURN3,0);
+    }
+    if (inByte == '4'){
+    Serial.println("Dropping plane 4...");
+    Serial1.println("$PT4DR#");
+    digitalWrite(BURN3,1);
+    delay(6000);
+    digitalWrite(BURN3,0);
+    }
+    if (inByte == '5'){
+    Serial.println("Dropping plane 5...");
+    Serial1.println("$PT5DR#");
+    digitalWrite(BURN3,1);
+    delay(6000);
+    digitalWrite(BURN3,0);
+    }
+    if (inByte == '6'){
+    Serial.println("Dropping plane 6...");
+    Serial1.println("$PT6DR#");
+    digitalWrite(BURN3,1);
+    delay(6000);
+    digitalWrite(BURN3,0);
+    }
+    if (inByte == '0'){
+    Serial.println("Daisy, Daisy, give me your answer do. I'm half crazy all for the love of you. It won't be a stylish marriage, I can't afford a carriage. But you'll look sweet upon the seat of a bicycle built for two.");
+    Serial1.println("$PT6DR#");
+    digitalWrite(BURN3,1);
+    delay(6000);
     digitalWrite(BURN3,0);
     }
   }
@@ -118,6 +150,8 @@ void loop() {
   }
   
   gpsdump(gps);
+  
+  //Toggle the onboard LED to show activity
   state = !state;
   digitalWrite(LED, state);
 }
