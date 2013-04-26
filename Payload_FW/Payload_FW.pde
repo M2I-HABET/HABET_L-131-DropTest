@@ -19,6 +19,7 @@
  0.25 - GPS library tested and tweaked, parsing NMEA strings 
  0.3 - Very basic system for reading in a char and triggering an output
  0.31 - Updated burn time to 6 sec, added command to trigger data log on plane, changed baud rates
+ 0.32 - Fixed inverted signal for cutdown due to new hardware.  Fixed logic with burner pins used
  
  */
 
@@ -31,6 +32,7 @@ int LED = 13;
 int BURN1 = 8;
 int BURN2 = 9;
 int BURN3 = 10;
+
 int state = 0;
 
 //Define String
@@ -53,10 +55,17 @@ long lat, lon;
 
 void setup() {
   
+  //Set LED to output and all Burn enable pins to output
   pinMode(LED, OUTPUT);
   pinMode(BURN1, OUTPUT);
   pinMode(BURN2, OUTPUT);
   pinMode(BURN3, OUTPUT);
+  
+  //Need to make sure that the burn pins are driven high
+  digitalWrite(BURN1,1);
+  digitalWrite(BURN2,1);
+  digitalWrite(BURN3,1);
+  
   // initialize all the serial ports!
   Serial.begin(57600);   //USB port and Radio out
   Serial1.begin(57600);  //Data from other RFD900, echos to 0
@@ -94,51 +103,56 @@ void loop() {
     if (inByte == '1'){
     Serial.println("Dropping plane 1...");
     Serial1.println("$PT1DR#");
-    digitalWrite(BURN1,1);
-    delay(6000);
     digitalWrite(BURN1,0);
+    delay(6000);
+    digitalWrite(BURN1,1);
     }
     if (inByte == '2'){
     Serial.println("Dropping plane 2...");
     Serial1.println("$PT2DR#");
-    digitalWrite(BURN2,1);
-    delay(6000);
     digitalWrite(BURN2,0);
+    delay(6000);
+    digitalWrite(BURN2,1);
     }
     if (inByte == '3'){
     Serial.println("Dropping plane 3...");
     Serial1.println("$PT3DR#");
-    digitalWrite(BURN3,1);
-    delay(6000);
     digitalWrite(BURN3,0);
+    delay(6000);
+    digitalWrite(BURN3,1);
     }
     if (inByte == '4'){
     Serial.println("Dropping plane 4...");
     Serial1.println("$PT4DR#");
-    digitalWrite(BURN3,1);
+    digitalWrite(BURN1,0);
     delay(6000);
-    digitalWrite(BURN3,0);
+    digitalWrite(BURN1,1);
     }
     if (inByte == '5'){
     Serial.println("Dropping plane 5...");
     Serial1.println("$PT5DR#");
-    digitalWrite(BURN3,1);
+    digitalWrite(BURN2,0);
     delay(6000);
-    digitalWrite(BURN3,0);
+    digitalWrite(BURN2,1);
     }
     if (inByte == '6'){
     Serial.println("Dropping plane 6...");
     Serial1.println("$PT6DR#");
-    digitalWrite(BURN3,1);
-    delay(6000);
     digitalWrite(BURN3,0);
+    delay(6000);
+    digitalWrite(BURN3,1);
     }
     if (inByte == '0'){
     Serial.println("Daisy, Daisy, give me your answer do. I'm half crazy all for the love of you. It won't be a stylish marriage, I can't afford a carriage. But you'll look sweet upon the seat of a bicycle built for two.");
-    Serial1.println("$PT6DR#");
-    digitalWrite(BURN3,1);
-    delay(6000);
+    Serial1.println("Aborting all planes...");
+    
+    digitalWrite(Burn1,0);
+    digitalWrite(Burn2,0);
     digitalWrite(BURN3,0);
+    delay(6000);
+    digitalWrite(BURN1,1);
+    digitalWrite(BURN2,1);
+    digitalWrite(BURN3,1);
     }
   }
   
