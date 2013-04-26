@@ -57,9 +57,9 @@ void setup() {
   
   //Set LED to output and all Burn enable pins to output
   pinMode(LED, OUTPUT);
-  pinMode(BURN1, OUTPUT);
-  pinMode(BURN2, OUTPUT);
-  pinMode(BURN3, OUTPUT);
+  pinMode(8, OUTPUT);
+  pinMode(9, OUTPUT);
+  pinMode(10, OUTPUT);
   
   //Need to make sure that the burn pins are driven high
   digitalWrite(BURN1,1);
