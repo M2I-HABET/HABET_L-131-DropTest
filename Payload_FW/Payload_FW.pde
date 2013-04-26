@@ -146,8 +146,8 @@ void loop() {
     Serial.println("Daisy, Daisy, give me your answer do. I'm half crazy all for the love of you. It won't be a stylish marriage, I can't afford a carriage. But you'll look sweet upon the seat of a bicycle built for two.");
     Serial1.println("Aborting all planes...");
     
-    digitalWrite(Burn1,0);
-    digitalWrite(Burn2,0);
+    digitalWrite(BURN1,0);
+    digitalWrite(BURN2,0);
     digitalWrite(BURN3,0);
     delay(6000);
     digitalWrite(BURN1,1);
