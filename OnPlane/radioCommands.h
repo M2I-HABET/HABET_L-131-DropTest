@@ -1,48 +1,35 @@
-#ifndef NEW_RADIO_COMMANDS_H_
-#define NEW_RADIO_COMMANDS_H_
+/**
+ * Header file containing miscellaneous variables and structures for the main
+ * part of the flight software used on the planes.
+ * 
+ * Authored by Ian McInerney, Iowa State University
+ * Created for the HABET LX-131-A&B flights in April 2013
+ */
+#ifndef RADIO_COMMANDS_H_
+#define RADIO_COMMANDS_H_
 
-extern char planeAddress = '1';
-extern bool planeDropped = false;
-extern bool telemEnable = true;
-
-//#define CLI_ENABLED ENABLED
-
-// Altitude to stop sending telemetry at (in centimeters)
-#define CUTOFF_ALTITUDE 300
+// Altitude to stop sending telemetry at (in millimeters)
+#define CUTOFF_ALTITUDE 12192000	// 40,000ft
 
 // Length of the receive buffer in bytes
 #define REC_BUF_LENG 255
 
-/*
- * Data type sizes:
- * float = 4 bytes
- * int16 = 2 bytes
- * int32 = 4 bytes
- * uint32 = 4 bytes
- */
-typedef struct HABET_462_telem {
-	char sync1;				// Sync Character 1 (P)
-	char direc;				// Direction of data packet (To/From)
-	char addr;				// Address of sending radio
-	char type;				// Type of the packet (T) for telemetry
-	uint32_t time;			// GPS time (milliseconds from epoch)
-	int32_t altitude;		// GPS altitude in m
-/*	int32_t roll;			// Roll angle (deg*100)
-	int32_t pitch;			// Pitch angle (deg*100)
-	int32_t yaw;			// Yaw angle (deg*100)
-*/	int16_t rollspeed;		// Angular speed around X axis (raw)
-	int16_t pitchspeed;		// Angular speed around Y axis (raw)
-	int16_t yawspeed;		// Angular speed around Z axis (raw)
-	int16_t xacc;			// X acceleration (raw)
-	int16_t yacc;			// Y acceleration (raw)
-	int16_t zacc;			// Z acceleration (raw)
-	int16_t xmag;			// X Magnetic field (raw)
-	int16_t ymag;			// Y Magnetic field (raw)
-	int16_t zmag;			// Z Magnetic field (raw)
-	char ending;			// Ending character (#)
-} HABET_462_telem;
+// The address of the plane which is used in all communciations
+extern char planeAddress = '6';
 
-// Size of the telemetry packet in bytes
-#define HABET_462_TELEM_SIZE 43
+// Miscellaneous variables to keep track of the current state of the plane
+extern bool planeDropped = false;
+extern bool telemEnable = true;
+extern bool telemLong = true;
+
+// Enumerated list of all the commands which can be sent to the plane
+typedef enum HABET_462_COMMANDS {
+	HABET_462_NO_OP = 0,
+	HABET_462_TELEM_ENABLE = 1,
+	HABET_462_TELEM_DISABLE = 2,
+	HABET_462_PLANE_DROPPED = 3,
+	HABET_462_ENABLE_SHORT = 4,
+	HABET_462_ENABLE_LONG = 5,
+};
 
 #endif
