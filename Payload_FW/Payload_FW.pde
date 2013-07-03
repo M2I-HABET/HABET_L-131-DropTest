@@ -20,6 +20,8 @@
  0.3 - Very basic system for reading in a char and triggering an output
  0.31 - Updated burn time to 6 sec, added command to trigger data log on plane, changed baud rates
  0.32 - Fixed inverted signal for cutdown due to new hardware.  Fixed logic with burner pins used
+ 0.33 - Changed from byte comparasion to string comparasion for more robust code
+ 
  
  */
 
@@ -39,6 +41,8 @@ int state = 0;
 
 char  Lat[20];
 char  Lon[20];
+
+ch
 
 
 static void gpsdump(TinyGPS &gps);
