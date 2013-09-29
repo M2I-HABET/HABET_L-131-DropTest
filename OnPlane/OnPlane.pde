@@ -81,7 +81,7 @@ void loop() {
 	sendLength = 4;
 	
 	// See if the plane has received any commands then act on them
-	switch(checkTelemCommands()) {
+	switch (checkTelemCommands()) {
 	case HABET_462_NO_OP:
 		// Don't do anything
 		break;
@@ -123,25 +123,25 @@ void loop() {
 	}
 	
 	// Only send the buffer if more than the header is present
-	if(sendLength > 4) {
+	if (sendLength > 4) {
 		Serial.println(sendBuf);
 	}
 	
 	// Check every loop iteration to see if there is new GPS data
-	if(gps.readGPS() == true) {
+	if (gps.readGPS() == true) {
 		// If there is new data, then get it and save it
 		pos = gps.getPositionInfo();
 	}
 	
 	// Run the IMU telemetry collection every IMU_PERIOD milliseconds
-	if((time % IMU_PERIOD) == 0) {
+	if ( (time % IMU_PERIOD) == 0) {
 		imuCollecTime = time;			// Store the current time
 		accel = imu.getRawAccelData();	// Read the accelerometer data
 		gyro = imu.getRawGyroData();	// Read the gyro data
 		mag = compass.getData();		// Read the compass data
 
 		// If telemetry is enabled then print out the telemetry string
-		if(telemEnable) {
+		if (telemEnable) {
 			Serial.print("$P");
 			Serial.print(planeAddress);
 			Serial.print("FT,");
@@ -169,7 +169,7 @@ void loop() {
 			Serial.print(",");
 			Serial.print(pos.altitude, DEC);
 			
-			if(telemLong) {
+			if (telemLong) {
 				// Only print out these values if the long telemetry string is enabled
 				Serial.print(",");
 				Serial.print(pos.latitude, DEC);
@@ -187,7 +187,7 @@ void loop() {
 		}
 		
 		// Disable the telemetry if the plane is below the threshold and has been dropped
-		if ((pos.altitude < CUTOFF_ALTITUDE) && planeDropped)
+		if ( (pos.altitude < CUTOFF_ALTITUDE) && planeDropped)
 			telemEnable = false;
 	}
 }
@@ -201,31 +201,37 @@ int checkTelemCommands() {
 	int retVal = HABET_462_NO_OP;
 
 	// While there is data available, stay in the loop and receive it
-	while(Serial.available() && recLength<REC_BUF_LENG) {
+	while (Serial.available() && recLength<REC_BUF_LENG) {
 		recBuf[recLength] = Serial.read();
 		recLength++;
 	}
 	
 	// Commands must be prefaced with $ to be valid
-	if(recBuf[0] != '$') {
+	if (recBuf[0] != '$') {
 		recLength = 0;
 		return(retVal);
 	}
 	
 	// Check to see if the terminating character of # has been received
 	// If it has continue processing otherwise exit the function
-	if(recBuf[recLength-1] != '#')
+	if (recBuf[recLength-1] != '#')
 		return(retVal);
 
-	// Check to see if the message is detined to be received by this plane
-	if(recBuf[1] != 'P' && recBuf[2] != 'T' && recBuf[3] != planeAddress ) {
+	// Check to see if the message received is destined for a plane
+	if (recBuf[1] != 'P' && recBuf[2] != 'T') {
 		recLength = 0;
 		return(retVal);
 	}
-	
+
+	// Check to see if the message is detined to be received by this plane
+	if (recBuf[3] != planeAddress) {
+		recLength = 0;
+		return(retVal);
+	}
+
 	// Switch over the possible two character command strings
-	if(recBuf[4] == 'T') {
-		switch(recBuf[5]) {
+	if (recBuf[4] == 'T') {
+		switch (recBuf[5]) {
 		case 'D':
 			// Disable the telemetry system
 			retVal = HABET_462_TELEM_DISABLE;
@@ -245,13 +251,13 @@ int checkTelemCommands() {
 			// Nothing to do
 			break;
 		}
-	} else if(recBuf[4] == 'D' && recBuf[5] == 'R') {
+	} else if (recBuf[4] == 'D' && recBuf[5] == 'R') {
 		// Plane has been dropped
 		retVal = HABET_462_PLANE_DROPPED;
 	}
 	
 	// Reset the received length counter when a new command has been received and parsed
-	if(retVal != 0)
+	if (retVal != 0)
 		recLength = 0;
 
 	return(retVal);
